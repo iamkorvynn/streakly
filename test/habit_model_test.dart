@@ -75,7 +75,7 @@ void main() {
         createdAt: DateTime(2026, 11, 1),
       );
       expect(habit.icon.codePoint, Icons.menu_book.codePoint);
-      expect(habit.color, Colors.green);
+      expect(habit.color.toARGB32(), Colors.green.toARGB32());
     });
   });
 
