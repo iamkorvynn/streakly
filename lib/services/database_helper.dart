@@ -41,7 +41,7 @@ class DatabaseHelper {
       CREATE TABLE habits (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        icon_code_point INTEGER NOT NULL,
+        icon_index INTEGER NOT NULL,
         color_value INTEGER NOT NULL,
         target_days INTEGER NOT NULL DEFAULT 30,
         reminder_minutes INTEGER,
