@@ -10,6 +10,9 @@ void main() {
   setUpAll(() {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
+    // Own database file: test files run in parallel and would
+    // otherwise lock each other's database.
+    DatabaseHelper.databaseName = 'test_database.db';
   });
 
   setUp(() async {
@@ -22,7 +25,7 @@ void main() {
     await db.close();
     // Remove the test database file so each test starts clean.
     final path = await getDatabasesPath();
-    await deleteDatabase('$path/streakly.db');
+    await deleteDatabase('$path/test_database.db');
   });
 
   Habit makeHabit({String name = 'Read'}) => Habit(
