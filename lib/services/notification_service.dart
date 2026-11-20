@@ -32,8 +32,8 @@ class NotificationService {
     }
     try {
       tz_data.initializeTimeZones();
-      final String timeZoneName = await FlutterTimezone.getLocalTimezone();
-      tz.setLocalLocation(tz.getLocation(timeZoneName));
+      final timeZoneName = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(timeZoneName.identifier));
     } catch (_) {
       // Device time zone unknown: fall back to UTC. Reminders still
       // schedule; they may fire at the wrong wall-clock time.
@@ -42,7 +42,7 @@ class NotificationService {
     try {
       const androidSettings = AndroidInitializationSettings('ic_launcher');
       const settings = InitializationSettings(android: androidSettings);
-      await _plugin.initialize(settings);
+      await _plugin.initialize(settings: settings);
     } catch (_) {
       // Plugin unavailable (e.g. in tests): reminders stay off.
     }
@@ -92,11 +92,11 @@ class NotificationService {
     final scheduled = tz.TZDateTime.from(next, tz.local);
     try {
       await _plugin.zonedSchedule(
-        id,
-        'Time for ${habit.name}',
-        'Keep your streak going — tap to check in.',
-        scheduled,
-        const NotificationDetails(
+        id: id,
+        title: 'Time for ${habit.name}',
+        body: 'Keep your streak going — tap to check in.',
+        scheduledDate: scheduled,
+        notificationDetails: const NotificationDetails(
           android: AndroidNotificationDetails(
             'streakly_reminders',
             'Habit reminders',
@@ -116,7 +116,7 @@ class NotificationService {
   /// Cancels the reminder for one habit.
   Future<void> cancelHabitReminder(int habitId) async {
     try {
-      await _plugin.cancel(habitId);
+      await _plugin.cancel(id: habitId);
     } catch (_) {
       // Plugin unavailable: nothing to cancel.
     }
