@@ -3,7 +3,6 @@ import 'package:material_ui/material_ui.dart';
 import '../models/habit.dart';
 import '../services/habit_repository.dart';
 import '../utils/app_colors.dart';
-import '../utils/app_icons.dart';
 import '../utils/reminder_time.dart';
 import '../widgets/color_picker.dart';
 import '../widgets/icon_picker.dart';
@@ -28,7 +27,7 @@ class AddEditHabitScreen extends StatefulWidget {
 
 class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
   final _nameController = TextEditingController();
-  late int _iconCodePoint;
+  late int _iconIndex;
   late int _colorValue;
   late double _targetDays;
   bool _reminderEnabled = false;
@@ -42,8 +41,7 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
     super.initState();
     final habit = widget.habit;
     _nameController.text = habit?.name ?? '';
-    _iconCodePoint =
-        habit?.iconCodePoint ?? habitIconOptions.first.icon.codePoint;
+    _iconIndex = habit?.iconIndex ?? 0;
     _colorValue = habit?.colorValue ?? habitColorOptions.first.color.toARGB32();
     _targetDays = (habit?.targetDays ?? 30).toDouble();
     _reminderEnabled = habit?.reminderMinutes != null;
@@ -82,7 +80,7 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
       await widget.repository.createHabit(
         Habit(
           name: name,
-          iconCodePoint: _iconCodePoint,
+          iconIndex: _iconIndex,
           colorValue: _colorValue,
           targetDays: _targetDays.round(),
           reminderMinutes: _reminderEnabled
@@ -95,7 +93,7 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
       await widget.repository.updateHabit(
         existing.copyWith(
           name: name,
-          iconCodePoint: _iconCodePoint,
+          iconIndex: _iconIndex,
           colorValue: _colorValue,
           targetDays: _targetDays.round(),
           reminderMinutes: _reminderEnabled
@@ -144,10 +142,10 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
             const _SectionLabel('Icon'),
             const SizedBox(height: 12),
             IconPicker(
-              selectedCodePoint: _iconCodePoint,
+              selectedIndex: _iconIndex,
               color: color,
-              onSelected: (codePoint) =>
-                  setState(() => _iconCodePoint = codePoint),
+              onSelected: (index) =>
+                  setState(() => _iconIndex = index),
             ),
             const SizedBox(height: 24),
             const _SectionLabel('Colour'),
@@ -185,7 +183,7 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
               title: const Text('Daily reminder'),
               subtitle: const Text('Get a nudge at the same time each day'),
               value: _reminderEnabled,
-              activeColor: color,
+              activeThumbColor: color,
               onChanged: (value) =>
                   setState(() => _reminderEnabled = value),
               contentPadding: EdgeInsets.zero,
