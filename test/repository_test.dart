@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:streakly/models/habit.dart';
 import 'package:streakly/services/database_helper.dart';
@@ -25,23 +24,23 @@ void main() {
     await deleteDatabase('$path/streakly.db');
   });
 
-  Habit _habit({String name = 'Read', int? reminderMinutes}) => Habit(
+  Habit makeHabit({String name = 'Read', int? reminderMinutes}) => Habit(
         name: name,
-        iconCodePoint: 0xe3a1,
+        iconIndex: 2,
         colorValue: 0xFFE64A19,
         reminderMinutes: reminderMinutes,
         createdAt: DateTime.now(),
       );
 
   test('create then list active habits', () async {
-    await repo.createHabit(_habit(name: 'Read'));
-    await repo.createHabit(_habit(name: 'Run'));
+    await repo.createHabit(makeHabit(name: 'Read'));
+    await repo.createHabit(makeHabit(name: 'Run'));
     final habits = await repo.getActiveHabits();
     expect(habits.map((h) => h.name), ['Read', 'Run']);
   });
 
   test('toggleCheckInToday flips state', () async {
-    final habit = await repo.createHabit(_habit());
+    final habit = await repo.createHabit(makeHabit());
     expect(await repo.isCheckedToday(habit), isFalse);
     expect(await repo.toggleCheckInToday(habit), isTrue);
     expect(await repo.isCheckedToday(habit), isTrue);
@@ -50,7 +49,7 @@ void main() {
   });
 
   test('toggleCheckIn works for past days', () async {
-    final habit = await repo.createHabit(_habit());
+    final habit = await repo.createHabit(makeHabit());
     final yesterday = DateTime.now().subtract(const Duration(days: 1));
     expect(await repo.toggleCheckIn(habit, yesterday), isTrue);
     final dates = await repo.getCheckedDates(habit);
@@ -58,7 +57,7 @@ void main() {
   });
 
   test('stats reflect check-ins', () async {
-    final habit = await repo.createHabit(_habit());
+    final habit = await repo.createHabit(makeHabit());
     final today = DateTime.now();
     await repo.toggleCheckIn(habit, today.subtract(const Duration(days: 1)));
     await repo.toggleCheckIn(habit, today);
@@ -69,7 +68,7 @@ void main() {
   });
 
   test('archive hides the habit and restore brings it back', () async {
-    final habit = await repo.createHabit(_habit());
+    final habit = await repo.createHabit(makeHabit());
     await repo.archiveHabit(habit, true);
     expect(await repo.getActiveHabits(), isEmpty);
     expect((await repo.getArchivedHabits()).length, 1);
@@ -79,14 +78,14 @@ void main() {
   });
 
   test('delete removes the habit entirely', () async {
-    final habit = await repo.createHabit(_habit());
+    final habit = await repo.createHabit(makeHabit());
     await repo.toggleCheckInToday(habit);
     await repo.deleteHabit(habit);
     expect(await repo.getActiveHabits(), isEmpty);
   });
 
   test('notes round-trip through the repository', () async {
-    final habit = await repo.createHabit(_habit());
+    final habit = await repo.createHabit(makeHabit());
     await repo.addNote(habit, DateTime.now(), 'Great session');
     final notes = await repo.getNotes(habit);
     expect(notes.length, 1);
@@ -96,8 +95,8 @@ void main() {
   });
 
   test('overall stats aggregate across habits', () async {
-    final a = await repo.createHabit(_habit(name: 'A'));
-    final b = await repo.createHabit(_habit(name: 'B'));
+    final a = await repo.createHabit(makeHabit(name: 'A'));
+    final b = await repo.createHabit(makeHabit(name: 'B'));
     await repo.toggleCheckInToday(a);
     await repo.toggleCheckInToday(b);
     final overall = await repo.getOverallStats();
@@ -108,7 +107,7 @@ void main() {
   });
 
   test('deleteAllData wipes everything', () async {
-    await repo.createHabit(_habit());
+    await repo.createHabit(makeHabit());
     await repo.deleteAllData();
     expect(await repo.getActiveHabits(), isEmpty);
   });
@@ -117,7 +116,7 @@ void main() {
     // In tests the notification plugin is unavailable; the repository
     // must still create the habit without throwing.
     final habit = await repo.createHabit(
-      _habit(reminderMinutes: 8 * 60),
+      makeHabit(reminderMinutes: 8 * 60),
     );
     expect(habit.id, isNotNull);
     expect((await repo.getActiveHabits()).length, 1);

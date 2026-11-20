@@ -4,10 +4,11 @@ import 'package:streakly/services/streak_calculator.dart';
 void main() {
   // Fixed "today" so tests are deterministic.
   final today = DateTime(2026, 11, 20);
-  final d = (int day) => DateTime(2026, 11, day);
+  DateTime d(int day) => DateTime(2026, 11, day);
 
-  Set<DateTime> days(List<int> dayNumbers) =>
-      dayNumbers.map(d).toSet();
+  Set<DateTime> days(List<int> dayNumbers) {
+    return dayNumbers.map(d).toSet();
+  }
 
   group('currentStreak', () {
     test('empty set has no streak', () {

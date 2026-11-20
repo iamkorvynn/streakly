@@ -11,7 +11,7 @@ void main() {
       final withDate = Habit(
         id: 7,
         name: 'Read',
-        iconCodePoint: Icons.menu_book.codePoint,
+        iconIndex: 2,
         colorValue: 0xFFE64A19,
         targetDays: 30,
         reminderMinutes: 510,
@@ -20,7 +20,7 @@ void main() {
       final restored = Habit.fromMap(withDate.toMap());
       expect(restored.id, 7);
       expect(restored.name, 'Read');
-      expect(restored.iconCodePoint, Icons.menu_book.codePoint);
+      expect(restored.iconIndex, 2);
       expect(restored.colorValue, 0xFFE64A19);
       expect(restored.targetDays, 30);
       expect(restored.reminderMinutes, 510);
@@ -31,7 +31,7 @@ void main() {
     test('defaults: 30-day target, no reminder, not archived', () {
       final real = Habit(
         name: 'Meditate',
-        iconCodePoint: 0xe3a1,
+        iconIndex: 2,
         colorValue: 0xFF000000,
         createdAt: DateTime(2026, 11, 1),
       );
@@ -45,7 +45,7 @@ void main() {
     test('reminderTimeOfDay converts minutes correctly', () {
       final habit = Habit(
         name: 'Run',
-        iconCodePoint: 0xe3a1,
+        iconIndex: 2,
         colorValue: 0xFF000000,
         reminderMinutes: 8 * 60 + 30,
         createdAt: DateTime(2026, 11, 1),
@@ -57,7 +57,7 @@ void main() {
     test('copyWith can clear a reminder', () {
       final habit = Habit(
         name: 'Run',
-        iconCodePoint: 0xe3a1,
+        iconIndex: 2,
         colorValue: 0xFF000000,
         reminderMinutes: 510,
         createdAt: DateTime(2026, 11, 1),
@@ -70,11 +70,11 @@ void main() {
     test('icon and color getters work', () {
       final habit = Habit(
         name: 'Read',
-        iconCodePoint: Icons.menu_book.codePoint,
+        iconIndex: 2,
         colorValue: Colors.green.toARGB32(),
         createdAt: DateTime(2026, 11, 1),
       );
-      expect(habit.icon.codePoint, Icons.menu_book.codePoint);
+      expect(habit.icon.codePoint, 2);
       expect(habit.color, Colors.green);
     });
   });

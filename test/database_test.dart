@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:streakly/models/habit.dart';
 import 'package:streakly/models/habit_note.dart';
@@ -26,16 +25,16 @@ void main() {
     await deleteDatabase('$path/streakly.db');
   });
 
-  Habit _habit({String name = 'Read'}) => Habit(
+  Habit makeHabit({String name = 'Read'}) => Habit(
         name: name,
-        iconCodePoint: 0xe3a1,
+        iconIndex: 2,
         colorValue: 0xFFE64A19,
         createdAt: DateTime(2026, 11, 1),
       );
 
   group('habits', () {
     test('insert then get returns the habit', () async {
-      final id = await db.insertHabit(_habit());
+      final id = await db.insertHabit(makeHabit());
       final fetched = await db.getHabit(id);
       expect(fetched, isNotNull);
       expect(fetched!.name, 'Read');
@@ -44,8 +43,8 @@ void main() {
     });
 
     test('getHabits filters archived', () async {
-      final id1 = await db.insertHabit(_habit(name: 'Read'));
-      final id2 = await db.insertHabit(_habit(name: 'Run'));
+      final id1 = await db.insertHabit(makeHabit(name: 'Read'));
+      final id2 = await db.insertHabit(makeHabit(name: 'Run'));
       final habit2 = (await db.getHabit(id2))!;
       await db.updateHabit(habit2.copyWith(archived: true));
       final active = await db.getHabits(archived: false);
@@ -55,14 +54,14 @@ void main() {
     });
 
     test('update changes the name', () async {
-      final id = await db.insertHabit(_habit());
+      final id = await db.insertHabit(makeHabit());
       final habit = (await db.getHabit(id))!;
       await db.updateHabit(habit.copyWith(name: 'Read 10 pages'));
       expect((await db.getHabit(id))!.name, 'Read 10 pages');
     });
 
     test('delete removes habit, check-ins and notes', () async {
-      final id = await db.insertHabit(_habit());
+      final id = await db.insertHabit(makeHabit());
       await db.insertCheckIn(id, DateTime(2026, 11, 20));
       await db.insertNote(HabitNote(
         habitId: id,
@@ -77,36 +76,36 @@ void main() {
     });
 
     test('countHabits counts active habits', () async {
-      await db.insertHabit(_habit(name: 'A'));
-      await db.insertHabit(_habit(name: 'B'));
+      await db.insertHabit(makeHabit(name: 'A'));
+      await db.insertHabit(makeHabit(name: 'B'));
       expect(await db.countHabits(), 2);
     });
   });
 
   group('check-ins', () {
     test('insert and isChecked round-trip', () async {
-      final id = await db.insertHabit(_habit());
+      final id = await db.insertHabit(makeHabit());
       expect(await db.isChecked(id, DateTime(2026, 11, 20)), isFalse);
       expect(await db.insertCheckIn(id, DateTime(2026, 11, 20)), isTrue);
       expect(await db.isChecked(id, DateTime(2026, 11, 20)), isTrue);
     });
 
     test('duplicate check-in for the same day is ignored', () async {
-      final id = await db.insertHabit(_habit());
+      final id = await db.insertHabit(makeHabit());
       expect(await db.insertCheckIn(id, DateTime(2026, 11, 20)), isTrue);
       expect(await db.insertCheckIn(id, DateTime(2026, 11, 20)), isFalse);
       expect(await db.countCheckIns(id), 1);
     });
 
     test('delete removes the check-in', () async {
-      final id = await db.insertHabit(_habit());
+      final id = await db.insertHabit(makeHabit());
       await db.insertCheckIn(id, DateTime(2026, 11, 20));
       await db.deleteCheckIn(id, DateTime(2026, 11, 20));
       expect(await db.isChecked(id, DateTime(2026, 11, 20)), isFalse);
     });
 
     test('getCheckedDates returns all dates', () async {
-      final id = await db.insertHabit(_habit());
+      final id = await db.insertHabit(makeHabit());
       await db.insertCheckIn(id, DateTime(2026, 11, 18));
       await db.insertCheckIn(id, DateTime(2026, 11, 20));
       final dates = await db.getCheckedDates(id);
@@ -119,7 +118,7 @@ void main() {
 
   group('notes', () {
     test('insert, list newest first, delete', () async {
-      final id = await db.insertHabit(_habit());
+      final id = await db.insertHabit(makeHabit());
       final noteId = await db.insertNote(HabitNote(
         habitId: id,
         date: DateTime(2026, 11, 19),
@@ -142,7 +141,7 @@ void main() {
 
   group('deleteAllData', () {
     test('wipes habits, check-ins and notes', () async {
-      final id = await db.insertHabit(_habit());
+      final id = await db.insertHabit(makeHabit());
       await db.insertCheckIn(id, DateTime(2026, 11, 20));
       await db.deleteAllData();
       expect(await db.getHabits(), isEmpty);

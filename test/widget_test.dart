@@ -6,7 +6,6 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:streakly/main.dart';
 import 'package:streakly/models/habit.dart';
@@ -40,28 +39,19 @@ void main() {
     await deleteDatabase('$path/streakly.db');
   });
 
-  Habit _habit({String name = 'Read'}) => Habit(
+  Habit makeHabit({String name = 'Read'}) => Habit(
         name: name,
-        iconCodePoint: Icons.menu_book.codePoint,
+        iconIndex: 2,
         colorValue: Colors.deepOrange.toARGB32(),
         createdAt: DateTime.now(),
       );
 
-  const emptyStats = HabitStats(
-    currentStreak: 0,
-    bestStreak: 0,
-    totalCheckIns: 0,
-    completionLast7: 0,
-    completionLast30: 0,
-    daysSinceStart: 1,
-  );
-
-  Widget _wrap(Widget child) => MaterialApp(home: child);
+  Widget wrapWidget(Widget child) => MaterialApp(home: child);
 
   group('HomeScreen', () {
     testWidgets('shows the empty state when no habits exist',
         (tester) async {
-      await tester.pumpWidget(_wrap(HomeScreen(repository: repo)));
+      await tester.pumpWidget(wrapWidget(HomeScreen(repository: repo)));
       await tester.pumpAndSettle();
       expect(find.text('No habits yet'), findsOneWidget);
       expect(find.text('Add your first habit'), findsOneWidget);
@@ -69,8 +59,8 @@ void main() {
 
     testWidgets('lists a created habit with its streak',
         (tester) async {
-      await repo.createHabit(_habit(name: 'Morning run'));
-      await tester.pumpWidget(_wrap(HomeScreen(repository: repo)));
+      await repo.createHabit(makeHabit(name: 'Morning run'));
+      await tester.pumpWidget(wrapWidget(HomeScreen(repository: repo)));
       await tester.pumpAndSettle();
       expect(find.text('Morning run'), findsOneWidget);
       expect(find.text('Today'), findsOneWidget);
@@ -79,8 +69,8 @@ void main() {
 
     testWidgets('tapping the check button checks the habit in',
         (tester) async {
-      final habit = await repo.createHabit(_habit(name: 'Read'));
-      await tester.pumpWidget(_wrap(HomeScreen(repository: repo)));
+      final habit = await repo.createHabit(makeHabit(name: 'Read'));
+      await tester.pumpWidget(wrapWidget(HomeScreen(repository: repo)));
       await tester.pumpAndSettle();
       // The check button is the circular button on the card.
       final checkButtons = find.byIcon(Icons.check);
@@ -95,8 +85,8 @@ void main() {
   group('HabitCard', () {
     testWidgets('renders name, best streak and target progress',
         (tester) async {
-      final habit = _habit(name: 'Meditate').copyWith(id: 1);
-      await tester.pumpWidget(_wrap(
+      final habit = makeHabit(name: 'Meditate').copyWith(id: 1);
+      await tester.pumpWidget(wrapWidget(
         Scaffold(
           body: HabitCard(
             habit: habit,
@@ -126,7 +116,7 @@ void main() {
   group('StreakBadge', () {
     testWidgets('shows the streak number', (tester) async {
       await tester.pumpWidget(
-        _wrap(const Scaffold(body: StreakBadge(streak: 21))),
+        wrapWidget(const Scaffold(body: StreakBadge(streak: 21))),
       );
       expect(find.text('21'), findsOneWidget);
       expect(find.byIcon(Icons.local_fire_department), findsOneWidget);
@@ -135,7 +125,7 @@ void main() {
 
   group('WeekStrip', () {
     testWidgets('renders seven day dots', (tester) async {
-      await tester.pumpWidget(_wrap(
+      await tester.pumpWidget(wrapWidget(
         Scaffold(
           body: WeekStrip(
             checkedDays: <DateTime>{DateTime.now()},
@@ -149,7 +139,7 @@ void main() {
 
   group('HeatmapWidget', () {
     testWidgets('renders the legend and total', (tester) async {
-      await tester.pumpWidget(_wrap(
+      await tester.pumpWidget(wrapWidget(
         Scaffold(
           body: HeatmapWidget(
             checkedDays: <DateTime>{DateTime.now()},
@@ -167,7 +157,7 @@ void main() {
   group('AddEditHabitScreen', () {
     testWidgets('saving with a name creates the habit', (tester) async {
       await tester.pumpWidget(
-        _wrap(AddEditHabitScreen(repository: repo)),
+        wrapWidget(AddEditHabitScreen(repository: repo)),
       );
       await tester.pumpAndSettle();
       expect(find.text('New habit'), findsOneWidget);
@@ -184,7 +174,7 @@ void main() {
     testWidgets('saving with an empty name shows a warning',
         (tester) async {
       await tester.pumpWidget(
-        _wrap(AddEditHabitScreen(repository: repo)),
+        wrapWidget(AddEditHabitScreen(repository: repo)),
       );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Save').first);
