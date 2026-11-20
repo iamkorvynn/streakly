@@ -154,7 +154,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         padding: const EdgeInsets.all(16),
         children: <Widget>[
           DropdownButtonFormField<Habit>(
-            value: habit,
+            initialValue: habit,
             decoration: const InputDecoration(
               labelText: 'Habit',
               border: OutlineInputBorder(),
