@@ -1,5 +1,5 @@
 import '../models/habit_stats.dart';
-import 'date_utils.dart';
+import '../utils/date_utils.dart';
 
 /// Pure streak and completion maths over a set of checked-in dates.
 ///
