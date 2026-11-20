@@ -1,45 +1,30 @@
 // Widget tests for Streakly's screens and widgets.
 //
-// The database runs on sqflite_common_ffi so widget tests exercise the
-// real storage path. No demo data is seeded anywhere — tests create
-// their own habits and wipe the database afterwards.
+// These run against FakeHabitRepository (in-memory) so they stay fast and
+// deterministic: the real SQLite ffi isolate is CPU-starved on this VM and
+// makes pumpAndSettle time out. Real storage is covered by
+// database_test.dart and repository_test.dart. No demo data is seeded
+// anywhere — tests create their own habits.
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:streakly/main.dart';
 import 'package:streakly/models/habit.dart';
 import 'package:streakly/models/habit_stats.dart';
 import 'package:streakly/screens/add_edit_habit_screen.dart';
 import 'package:streakly/screens/home_screen.dart';
-import 'package:streakly/services/database_helper.dart';
-import 'package:streakly/services/habit_repository.dart';
 import 'package:streakly/widgets/heatmap_widget.dart';
 import 'package:streakly/widgets/habit_card.dart';
 import 'package:streakly/widgets/streak_badge.dart';
 import 'package:streakly/widgets/week_strip.dart';
 
+import 'fake_repository.dart';
+
 void main() {
-  late HabitRepository repo;
+  late FakeHabitRepository repo;
 
-  setUpAll(() {
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
-    // Own database file: test files run in parallel and would
-    // otherwise lock each other's database.
-    DatabaseHelper.databaseName = 'test_widget.db';
-  });
-
-  setUp(() async {
-    repo = HabitRepository();
-    await DatabaseHelper.instance.deleteAllData();
-  });
-
-  tearDown(() async {
-    await DatabaseHelper.instance.deleteAllData();
-    await DatabaseHelper.instance.close();
-    final path = await getDatabasesPath();
-    await deleteDatabase('$path/test_widget.db');
+  setUp(() {
+    repo = FakeHabitRepository();
   });
 
   Habit makeHabit({String name = 'Read'}) => Habit(
@@ -189,7 +174,7 @@ void main() {
 
   group('StreaklyApp', () {
     testWidgets('boots with four tabs', (tester) async {
-      await tester.pumpWidget(const StreaklyApp());
+      await tester.pumpWidget(StreaklyApp(repository: repo));
       await tester.pumpAndSettle();
       expect(find.text('Streakly'), findsOneWidget);
       expect(find.text('Today'), findsOneWidget);
