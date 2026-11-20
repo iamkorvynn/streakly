@@ -17,7 +17,11 @@ class DatabaseHelper {
 
   static final DatabaseHelper instance = DatabaseHelper._();
 
-  static const String _dbName = 'streakly.db';
+  /// Name of the database file. Tests override this so each test file
+  /// gets its own database (test files run in parallel processes and
+  /// would otherwise lock each other's database file).
+  static String databaseName = 'streakly.db';
+
   static const int _dbVersion = 1;
 
   Database? _db;
@@ -29,7 +33,7 @@ class DatabaseHelper {
     }
     final dir = await getDatabasesPath();
     _db = await openDatabase(
-      p.join(dir, _dbName),
+      p.join(dir, databaseName),
       version: _dbVersion,
       onCreate: _onCreate,
     );
