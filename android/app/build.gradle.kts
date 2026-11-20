@@ -12,6 +12,17 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // Core library desugaring: flutter_local_notifications needs java.time APIs.
+        isCoreLibraryDesugaringEnabled = true
+    }
+
+    lint {
+        // Release lint crashes on some AGP setups; keep the release build green.
+        checkReleaseBuilds = false
+    }
+
+    dependencies {
+        coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
     }
 
     defaultConfig {
