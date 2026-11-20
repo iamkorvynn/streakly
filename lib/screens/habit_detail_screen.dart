@@ -86,6 +86,9 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
     }
     await widget.repository.addNote(_habit, DateTime.now(), text);
     _noteController.clear();
+    if (!mounted) {
+      return;
+    }
     FocusScope.of(context).unfocus();
     await _load();
   }
