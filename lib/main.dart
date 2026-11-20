@@ -22,8 +22,13 @@ void main() async {
 }
 
 /// Root widget: Material 3 theming plus the four-tab shell.
+///
+/// [repository] is injectable so widget tests can pass a fake; production
+/// uses a real [HabitRepository] backed by SQLite.
 class StreaklyApp extends StatelessWidget {
-  const StreaklyApp({super.key});
+  const StreaklyApp({super.key, this.repository});
+
+  final HabitRepository? repository;
 
   @override
   Widget build(BuildContext context) {
@@ -33,21 +38,24 @@ class StreaklyApp extends StatelessWidget {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,
-      home: const MainScaffold(),
+      home: MainScaffold(repository: repository),
     );
   }
 }
 
 /// Bottom-navigation shell: Today, Calendar, Stats, Settings.
 class MainScaffold extends StatefulWidget {
-  const MainScaffold({super.key});
+  const MainScaffold({super.key, this.repository});
+
+  final HabitRepository? repository;
 
   @override
   State<MainScaffold> createState() => _MainScaffoldState();
 }
 
 class _MainScaffoldState extends State<MainScaffold> {
-  final HabitRepository _repository = HabitRepository();
+  late final HabitRepository _repository =
+      widget.repository ?? HabitRepository();
   int _tab = 0;
 
   late final List<Widget> _tabs = <Widget>[
