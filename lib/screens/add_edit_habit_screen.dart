@@ -106,7 +106,12 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
     if (!mounted) {
       return;
     }
-    Navigator.of(context).pop(true);
+    // maybePop: if this screen is the root route (as in widget tests)
+    // the pop is refused — reset the spinner so the UI can settle.
+    final popped = await Navigator.of(context).maybePop(true);
+    if (!popped && mounted) {
+      setState(() => _saving = false);
+    }
   }
 
   @override
