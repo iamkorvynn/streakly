@@ -8,14 +8,14 @@ import '../utils/app_icons.dart';
 class IconPicker extends StatelessWidget {
   const IconPicker({
     super.key,
-    required this.selectedCodePoint,
+    required this.selectedIndex,
     required this.color,
     required this.onSelected,
   });
 
-  final int selectedCodePoint;
+  final int selectedIndex;
   final Color color;
-  final void Function(int codePoint) onSelected;
+  final void Function(int index) onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +30,9 @@ class IconPicker extends StatelessWidget {
       itemCount: habitIconOptions.length,
       itemBuilder: (context, index) {
         final option = habitIconOptions[index];
-        final selected = option.icon.codePoint == selectedCodePoint;
+        final selected = index == selectedIndex;
         return InkWell(
-          onTap: () => onSelected(option.icon.codePoint),
+          onTap: () => onSelected(index),
           borderRadius: BorderRadius.circular(12),
           child: Container(
             decoration: BoxDecoration(
