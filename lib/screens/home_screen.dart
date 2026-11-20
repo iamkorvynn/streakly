@@ -88,18 +88,21 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!mounted) {
       return;
     }
-    // maybeOf: HomeScreen is normally inside MainScaffold's Scaffold,
-    // but it must not crash when used standalone (e.g. in tests).
-    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-      SnackBar(
-        content: Text(
-          nowChecked
-              ? '${habit.name} — done for today. Nice!'
-              : '${habit.name} — check-in removed.',
+    // Show the toast only when a Scaffold is present: MaterialApp always
+    // provides a ScaffoldMessenger, but it asserts when no Scaffold has
+    // registered with it (e.g. HomeScreen used standalone in tests).
+    if (Scaffold.maybeOf(context) != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            nowChecked
+                ? '${habit.name} — done for today. Nice!'
+                : '${habit.name} — check-in removed.',
+          ),
+          duration: const Duration(seconds: 2),
         ),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+      );
+    }
     await _load();
   }
 
