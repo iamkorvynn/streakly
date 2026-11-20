@@ -88,7 +88,9 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
+    // maybeOf: HomeScreen is normally inside MainScaffold's Scaffold,
+    // but it must not crash when used standalone (e.g. in tests).
+    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
       SnackBar(
         content: Text(
           nowChecked
