@@ -1,6 +1,6 @@
-/// Pure reminder-time maths, kept free of plugins so it is unit-testable.
-///
-/// Reminder times are stored as minutes since midnight (0..1439).
+// Pure reminder-time maths, kept free of plugins so it is unit-testable.
+//
+// Reminder times are stored as minutes since midnight (0..1439).
 
 /// The next wall-clock moment a reminder should fire.
 ///

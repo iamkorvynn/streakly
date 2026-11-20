@@ -1,7 +1,7 @@
-/// Date helpers for Streakly.
-///
-/// All dates are handled as date-only values (midnight, local time) so
-/// streak math is exact and never trips over time zones or clock times.
+// Date helpers for Streakly.
+//
+// All dates are handled as date-only values (midnight, local time) so
+// streak math is exact and never trips over time zones or clock times.
 
 /// Returns [date] with the time component stripped.
 DateTime dateOnly(DateTime date) => DateTime(date.year, date.month, date.day);
