@@ -1,4 +1,3 @@
-import '../models/check_in.dart';
 import '../models/habit.dart';
 import '../models/habit_note.dart';
 import '../models/habit_stats.dart';
@@ -190,6 +189,3 @@ class HabitRepository {
     await _db.deleteAllData();
   }
 }
-
-/// Convenience alias so tests can reference the check-in type.
-typedef CheckInRecord = CheckIn;
