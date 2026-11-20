@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../utils/app_icons.dart';
 import '../utils/date_utils.dart';
 
 /// A habit the user wants to build.
@@ -10,7 +11,7 @@ class Habit {
   const Habit({
     this.id,
     required this.name,
-    required this.iconCodePoint,
+    required this.iconIndex,
     required this.colorValue,
     this.targetDays = 30,
     this.reminderMinutes,
@@ -22,8 +23,9 @@ class Habit {
   final int? id;
   final String name;
 
-  /// [IconData.codePoint] of the chosen Material icon.
-  final int iconCodePoint;
+  /// Index into [habitIconOptions]. Stored instead of a code point
+  /// because Flutter 3.50's IconData requires constant arguments.
+  final int iconIndex;
 
   /// ARGB colour value of the habit.
   final int colorValue;
@@ -39,7 +41,10 @@ class Habit {
   final int sortOrder;
 
   /// The Material icon for this habit.
-  IconData get icon => IconData(iconCodePoint, fontFamily: 'MaterialIcons');
+  IconData get icon {
+    final index = iconIndex.clamp(0, habitIconOptions.length - 1);
+    return habitIconOptions[index].icon;
+  }
 
   /// The display colour for this habit.
   Color get color => Color(colorValue);
@@ -58,7 +63,7 @@ class Habit {
   Habit copyWith({
     int? id,
     String? name,
-    int? iconCodePoint,
+    int? iconIndex,
     int? colorValue,
     int? targetDays,
     int? reminderMinutes,
@@ -70,7 +75,7 @@ class Habit {
     return Habit(
       id: id ?? this.id,
       name: name ?? this.name,
-      iconCodePoint: iconCodePoint ?? this.iconCodePoint,
+      iconIndex: iconIndex ?? this.iconIndex,
       colorValue: colorValue ?? this.colorValue,
       targetDays: targetDays ?? this.targetDays,
       reminderMinutes: clearReminder
@@ -86,7 +91,7 @@ class Habit {
     return <String, Object?>{
       'id': id,
       'name': name,
-      'icon_code_point': iconCodePoint,
+      'icon_index': iconIndex,
       'color_value': colorValue,
       'target_days': targetDays,
       'reminder_minutes': reminderMinutes,
@@ -100,7 +105,7 @@ class Habit {
     return Habit(
       id: map['id'] as int?,
       name: map['name'] as String,
-      iconCodePoint: map['icon_code_point'] as int,
+      iconIndex: map['icon_index'] as int? ?? 0,
       colorValue: map['color_value'] as int,
       targetDays: map['target_days'] as int? ?? 30,
       reminderMinutes: map['reminder_minutes'] as int?,
